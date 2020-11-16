@@ -41,19 +41,21 @@ const empty = {
 }
 let memoryIndex
 let puzzles = []
+let elements = []
 console.log(localStorage.getItem('puzzles'));
-
+console.log(localStorage.getItem('elements'));
 puzzles.push(empty)
-
+elements.push('')
 startTIME()
 let numbersOfPuzzles
-localStorage.setItem('numbers', JSON.stringify(numbersOfPuzzles))
+
 console.log(localStorage.getItem('numbers'));
-if (localStorage.getItem('numbers') !== 'undefined') {
+if (localStorage.getItem('numbers') !== null) {
     console.log('here');
     numbersOfPuzzles = JSON.parse(localStorage.getItem('numbers'))
 } else {
     numbersOfPuzzles = [...Array(15).keys()].sort(() => Math.random() - 0.5)
+    localStorage.setItem('numbers', JSON.stringify(numbersOfPuzzles))
 }
 
 
@@ -74,24 +76,33 @@ for (let i = 1; i <= 15; i++) {
 
     puzzles.push({
         left: left,
-        top: top,
-        element: puzzle
+        top: top
     })
-    if (localStorage.getItem('puzzles') !== '{}') {
+    elements.push(puzzle)
+
+    if (localStorage.getItem('puzzles') !== null) {
+        puzzles = []
+
+        console.log(localStorage.getItem('puzzles'));
         puzzles = JSON.parse(localStorage.getItem('puzzles'))
         console.log(puzzles);
+
     }
+
+    console.log(elements[i]);
+
+
     puzzle.style.left = `${puzzles[i].left * sizeOfPuzzle}px`
     puzzle.style.top = `${puzzles[i].top * sizeOfPuzzle}px`
 
-
     field.append(puzzle)
-    localStorage.setItem('puzzles', JSON.stringify(field))
+
+    //localStorage.setItem('puzzles', JSON.stringify(field))
     puzzle.addEventListener('click', () => {
+        console.log(elements[i]);
 
         movePuzzle(i)
 
-        localStorage.setItem('puzzles', JSON.stringify(puzzles))
     })
 
 
@@ -121,24 +132,27 @@ btnReset.addEventListener('click', () => {
 function movePuzzle(index) {
 
     const puzzle = puzzles[index]
-
-    const leftDiff = Math.abs(empty.left - puzzle.left)
-    const topDiff = Math.abs(empty.top - puzzle.top)
+    const element = elements[index]
+    console.log(element);
+    const leftDiff = Math.abs(puzzles[0].left - puzzle.left)
+    const topDiff = Math.abs(puzzles[0].top - puzzle.top)
 
     if (leftDiff + topDiff > 1) {
         return
     }
     count += 1
     counts.innerHTML = `${count} steps`
-    puzzle.element.style.left = `${empty.left * sizeOfPuzzle}px`
-    puzzle.element.style.top = `${empty.top * sizeOfPuzzle}px`
+    console.log(element);
+    element.style.left = `${puzzles[0].left * sizeOfPuzzle}px`
+    element.style.top = `${puzzles[0].top * sizeOfPuzzle}px`
 
-    const emptyLeft = empty.left
-    const emptyTop = empty.top
-    empty.left = puzzle.left
-    empty.top = puzzle.top
+    const emptyLeft = puzzles[0].left
+    const emptyTop = puzzles[0].top
+    puzzles[0].left = puzzle.left
+    puzzles[0].top = puzzle.top
     puzzle.left = emptyLeft
     puzzle.top = emptyTop
+    localStorage.setItem('puzzles', JSON.stringify(puzzles))
 }
 
 function startTIME() {
